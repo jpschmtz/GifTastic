@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>GifTastic</title>
+</head>
+
+<body>
+    <h2>So you like .gif file formats?</h2>
+    <h4>Click a button to populate the page with gifs of that type, or create your own search button.</h4>
+    <h4>Remember they are pronounced "JIF"! </h4>
+    <form>
+        <span>Search Term: <input id="newSearch" type="text" ><input id="addNewSearch" type="submit"></span>
+    </form>
+        
+    <div class= "buttons">
+        <button search="cat">cat</button>
+        <button search="dog">dog</button>
+        <button search="snake">snake</button>
+    </div>
+  <div id="images">
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script type="text/javascript">
+    
+    $(document).on("click", "#addNewSearch", function(event) {
+      event.preventDefault();
+      var newTerm = $("#newSearch").val();
+      console.log(newTerm);
+      var newButton = $("<button>").attr("search", newTerm);
+        $(".buttons").append(newButton);
+        newButton.text(newTerm);
+        
+    });
+
+    $(document).on("click", "button", function() {
+        var i;
+        for (i=0; i < 3; i++){
+            var searchTerm = $(this).attr("search");
+            console.log(searchTerm)
+
+            var queryURL = "https://api.giphy.com/v1/gifs/random?api_key=dc6zaTOxFJmzC&tag="+ searchTerm + "";
+
+            $.ajax({
+                url: queryURL,
+                method: "GET"
+            })
+
+            .then(function(response) {
+                console.log(response)
+
+            var still = response.data.images.original_still.url;
+            var animate = response.data.image_original_url;
+
+            var results = $("<div>");
+            var title = $("<p>").text(response.data.title);
+                console.log(response.data.title);
+            results.attr("id", searchTerm);
+
+            var image = $("<img>");
+            image.attr("id", "gif");
+            image.attr("search", searchTerm);
+            image.attr("width", "250px");
+            image.attr("src", still);
+            image.attr("still", still);
+            image.attr("animate", animate);
+            image.attr("state", "still");
+            
+            $("#images").prepend(results);
+            $("#"+searchTerm).prepend(title)
+            $("#"+searchTerm).append(image);
+            });
+        }
+
+    });
+
+    $(document).on("click", "img", function() {
+      var state =$(this).attr("state")
+      console.log(state)
+      if (state == "still") {
+        var changeState =$(this).attr("animate")
+        console.log(changeState)
+        $(this).attr("src", changeState)
+        $(this).attr("state", "animate")
+      }else {
+        var changeState =$(this).attr("still")
+        console.log($(this).attr("still"))
+        $(this).attr("src", changeState)
+        $(this).attr("state", "still")
+      }
+    });
+
+  </script>
+</body>
+
+</html>
